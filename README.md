@@ -125,8 +125,19 @@ void loop() {
 Exemple complet à flasher : [`examples/sbus_basic`](examples/sbus_basic).
 
 ```sh
-pio run -d examples/sbus_basic -t upload --upload-port /dev/ttyUSB0
+pio run -d examples/sbus_basic -e esp32-s3-devkitc1-n8r8 -t upload --upload-port /dev/ttyACM0
 ```
+
+L'exemple définit la pin RX par `-DSBUS_RX_PIN=<n>` (défaut 2) et imprime sur `Serial` :
+
+| Carte | Pin RX | Moniteur | Build flags utiles |
+|---|---|---|---|
+| DevKitC-1 avec pont USB-UART | au choix | `/dev/ttyUSB*` (UART0) | aucune |
+| DevKitC-1 N8R8 (USB natif seul) | au choix | `/dev/ttyACM0` (CDC) | `-DARDUINO_USB_MODE=1 -DARDUINO_USB_CDC_ON_BOOT=1` |
+
+Sur une carte sans pont USB-UART, **sans** `-DARDUINO_USB_CDC_ON_BOOT=1`,
+`Serial` est UART0 (GPIO43/44) et le moniteur sur `/dev/ttyACM0` reste muet —
+erreur typique qui donne l'impression que rien ne marche.
 
 Sortie type (récepteur sous tension, émetteur éteint — d'où le failsafe) :
 
@@ -142,3 +153,11 @@ Sortie type (récepteur sous tension, émetteur éteint — d'où le failsafe) :
   l'entête `0x0F` et un timeout inter-octets de 10 ms servent de resynchronisation.
 - Testé sur ESP32-S3 (devkitC-1) avec un récepteur ELRS ; le code n'utilise rien de
   spécifique au S3 à part `HardwareSerial`, donc S2/C3/classiques devraient fonctionner.
+
+## Dépannage
+
+Aucun trame (`read()` faux, `frame_count()` à 0) :
+1. Vérifier la **pin** réelle du récepteur — erreur la plus fréquente.
+   Un scan UART (100kbauds 8E2, entête 0x0F) sur chaque pin la localise en quelques secondes.
+2. Vérifier que le **moniteur écoute le bon port** (pont USB-UART vs CDC natif, voir tableau).
+3. Vérifier l'**alim du récepteur** (5V ou 3V3 selon modèle) et la masse commune.
