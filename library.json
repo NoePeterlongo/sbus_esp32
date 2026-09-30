@@ -1,0 +1,9 @@
+{
+  "name": "SbusRx",
+  "version": "1.0.0",
+  "description": "SBUS receiver decoding for ESP32 (Arduino framework)",
+  "keywords": ["sbus", "rc", "receiver", "esp32", "rc-link", "elrs"],
+  "license": "MIT",
+  "frameworks": ["arduino"],
+  "platforms": ["espressif32"]
+}

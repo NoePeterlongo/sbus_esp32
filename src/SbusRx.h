@@ -6,18 +6,22 @@ public:
   static constexpr int kChannels = 16;
 
   bool begin(int rxPin, bool inverted = true, HardwareSerial& serial = Serial2);
-  void update();
 
-  bool isNewFrame() const { return newFrame_; }
-  bool isFailsafe() const { return failsafe_; }
-  bool isLinked() const;
+  bool read();
+
+  bool is_failsafe() const { return failsafe_; }
+  bool is_linked() const;
   bool ch17() const { return ch17_; }
   bool ch18() const { return ch18_; }
 
-  uint16_t channel(int index) const;
   uint16_t operator[](int index) const { return channel(index); }
-  float frameRate() const { return frameRate_; }
-  uint32_t frameCount() const { return frames_; }
+  uint16_t channel(int index) const;
+  uint16_t channel_us(int index) const;
+
+  float frame_rate() const { return frameRate_; }
+  uint32_t frame_count() const { return frames_; }
+  uint32_t last_frame_ms() const { return lastFrameMs_; }
+  bool rx_inverted() const { return inverted_; }
 
 private:
   void restart();
@@ -35,7 +39,6 @@ private:
   bool failsafe_ = false;
   bool ch17_ = false;
   bool ch18_ = false;
-  bool newFrame_ = false;
 
   uint32_t frames_ = 0;
   uint32_t lastFrameMs_ = 0;
